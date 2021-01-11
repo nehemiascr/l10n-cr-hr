@@ -12,6 +12,8 @@
         'hr_payroll',
     ],
     'data': [
+        'data/hr_contribution_register_data.xml',
+        'data/hr_salary_rule_category_data.xml',
         'data/hr_salary_rule_data.xml',
         'data/hr_payroll_structure_data.xml'
     ],

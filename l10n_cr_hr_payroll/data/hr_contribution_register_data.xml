@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="0">
+
+    <record id="hr_payroll.contrib_register_employees" model="hr.contribution.register">
+        <field name="name">Contribución Trabajador CCSS</field>
+        <field name="partner_id" eval="False"/>
+    </record>
+
+    <record id="contrib_register_company" model="hr.contribution.register">
+        <field name="name">Contribución Patronal CCSS</field>
+        <field name="partner_id" eval="False"/>
+    </record>
+
+</odoo>

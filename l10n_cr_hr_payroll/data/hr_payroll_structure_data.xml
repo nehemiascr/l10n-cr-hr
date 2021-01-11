@@ -1,15 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<odoo>
+<odoo noupdate="0">
 
-    <record id="hr_payroll_salary_structure_general" model="hr.payroll.structure">
+    <record id="hr_payroll.structure_base" model="hr.payroll.structure">
+        <field name="code">BASE</field>
+        <field name="name">Salario Base</field>
+        <field eval="[(6, 0, [ref('hr_payroll.hr_rule_basic'), ref('hr_payroll.hr_rule_taxable'), ref('hr_rule_employee_contributions'), ref('hr_rule_renta'), ref('hr_payroll.hr_rule_net'),ref('hr_rule_company_contributions'), ref('hr_rule_provision_vacaciones'),ref('hr_rule_provision_aguinaldo')])]" name="rule_ids"/>
+        <field name="company_id" ref="base.main_company"/>
+    </record>
+
+    <record id="structure_general" model="hr.payroll.structure">
         <field name="code">GENERAL</field>
         <field name="name">Salario General</field>
-        <field eval="[(6, 0, [
-            ref('hr_rule_ccss'),
-            ref('hr_rule_lpt'),
-            ref('hr_rule_renta')
-        ])]" name="rule_ids"/>
-        <field name="company_id" ref="base.main_company"/>    
+        <field eval="[(6, 0, [ref('hr_salary_rule_COMISION'), ref('hr_salary_rule_AHORRO')])]" name="rule_ids"/>
+        <field name="company_id" ref="base.main_company"/>
         <field name="parent_id" ref="hr_payroll.structure_base"/>
     </record>
 

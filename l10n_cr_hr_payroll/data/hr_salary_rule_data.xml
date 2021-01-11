@@ -1,50 +1,149 @@
 <?xml version="1.0" encoding="utf-8"?>
-<odoo noupdate="1">
+<odoo noupdate="0">
 
-    <record id="hr_rule_ccss" model="hr.salary.rule">
-        <field name="name">Caja Costarricense de Seguro Social</field>
+    <!-- Salary Rules : Salario Base -->
+    <record id="hr_payroll.hr_rule_basic" model="hr.salary.rule">
+        <field name="name">Salario Base</field>
+        <field name="sequence" eval="1"/>
+        <field name="code">BASE</field>
+        <field name="category_id" ref="hr_payroll.BASIC"/>
+        <field name="condition_select">none</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+# result = contract.wage
+result = contract.wage * worked_days.WORK100.number_of_days / 21
+</field>
+    </record>
+
+    <!-- Salary Rules : Comisiones-->
+    <record id="hr_salary_rule_COMISION" model="hr.salary.rule">
+        <field name="code">COMISION</field>
+        <field name="category_id" ref="hr_payroll.ALW"/>
+        <field name="name">Comisiones</field>
+        <field name="sequence" eval="15"/>
+        <field name="condition_select">python</field>
+        <field name="condition_python">result = inputs.COMISION.amount > 0</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">result = inputs.COMISION.amount</field>
+    </record>
+
+    <record id="hr_rule_input_COMISION" model="hr.rule.input">
+        <field name="code">COMISION</field>
+        <field name="name">Comisiones</field>
+        <field name="input_id" ref="hr_salary_rule_COMISION"/>
+    </record>
+
+    <!-- Salary Rules : Salario Bruto -->
+    <record id="hr_payroll.hr_rule_taxable" model="hr.salary.rule">
+        <field name="name">Salario Bruto</field>
+        <field name="sequence" eval="100"/>
+        <field name="code">BRUTO</field>
+        <field name="category_id" ref="hr_payroll.GROSS"/>
+        <field name="condition_select">none</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">result = categories.BASE + categories.INGRESO</field>
+    </record>
+
+    <!-- Salary Rules : Contribución Trabajador CCSS -->
+    <record id="hr_rule_employee_contributions" model="hr.salary.rule">
+        <field name="name">Contribución Trabajador CCSS</field>
         <field name="sequence" eval="110"/>
         <field name="code">CCSS</field>
         <field name="category_id" ref="hr_payroll.DED"/>
         <field name="condition_select">none</field>
         <field name="amount_select">code</field>
-        <field name="amount_python_compute">result = - (categories.GROSS * 0.095)</field>
+        <field name="amount_python_compute">result = - (categories.BRUTO * 0.105)</field>
+        <field name="register_id" ref="hr_payroll.contrib_register_employees"/>
     </record>
 
-    <record id="hr_rule_lpt" model="hr.salary.rule">
-        <field name="name">Aporte Trabajador Banco Popular</field>
-        <field name="sequence" eval="120"/>
-        <field name="code">LPT</field>
-        <field name="category_id" ref="hr_payroll.DED"/>
-        <field name="condition_select">none</field>
-        <field name="amount_select">code</field>
-        <field name="amount_python_compute">result = - (categories.GROSS * 0.01)</field>
-    </record>
-
+    <!-- Salary Rules : Impuesto sobre la renta -->
     <record id="hr_rule_renta" model="hr.salary.rule">
         <field name="name">Impuesto sobre la renta</field>
-        <field name="sequence" eval="130"/>
+        <field name="sequence" eval="120"/>
         <field name="code">RENTA</field>
         <field name="category_id" ref="hr_payroll.DED"/>
         <field name="condition_select">none</field>
         <field name="amount_select">code</field>
-        <field name="amount_python_compute">           
-            tramos = [ {'tasa':25, 'base':4337000},
-                    {'tasa':20, 'base':2169000},
-                    {'tasa':15, 'base':1236000},
-                    {'tasa':10, 'base':842000}  ]
+        <field name="amount_python_compute">
+tramos = [ {'tasa':25, 'base':4337000},
+           {'tasa':20, 'base':2169000},
+           {'tasa':15, 'base':1236000},
+           {'tasa':10, 'base':842000}  ]
 
-            salario = categories.GROSS
-            impuesto = 0.0
+salario = categories.BRUTO
+impuesto = 0.0
 
-            for tramo in tramos:
-                if salario > tramo['base']:
-                    monto = salario - tramo['base']
-                    impuesto += monto * tramo['tasa'] / 100
-                    salario -= monto
+for tramo in tramos:
+    if salario > tramo['base']:
+        monto = salario - tramo['base']
+        impuesto += monto * tramo['tasa'] / 100
+        salario -= monto
 
-            result = - (impuesto)
+result = - (impuesto)
         </field>
+    </record>
+
+
+    <!-- Salary Rules : Ahorro -->
+    <record id="hr_salary_rule_AHORRO" model="hr.salary.rule">
+        <field name="code">AHORRO</field>
+        <field name="category_id" ref="hr_payroll.DED"/>
+        <field name="name">Ahorro</field>
+        <field name="sequence" eval="130"/>
+        <field name="condition_select">python</field>
+        <field name="condition_python">result = inputs.AHORRO.amount > 0</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">result = - inputs.AHORRO.amount</field>
+    </record>
+
+    <record id="hr_rule_input_AHORRO" model="hr.rule.input">
+        <field name="code">AHORRO</field>
+        <field name="name">Ahorro</field>
+        <field name="input_id" ref="hr_salary_rule_AHORRO"/>
+    </record>
+
+    <record id="hr_payroll.hr_rule_net" model="hr.salary.rule">
+        <field name="name">Salario Neto</field>
+        <field name="sequence" eval="200"/>
+        <field name="code">NETO</field>
+        <field name="category_id" ref="hr_payroll.NET"/>
+        <field name="condition_select">none</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">result = categories.BASE + categories.INGRESO + categories.DEDUCCION</field>
+    </record>
+
+    <record id="hr_rule_company_contributions" model="hr.salary.rule">
+        <field name="name">Contribución Patronal CCSS</field>
+        <field name="sequence" eval="210"/>
+        <field name="code">PATRONAL</field>
+        <field name="category_id" ref="hr_payroll.COMP"/>
+        <field name="condition_select">none</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">result = categories.BRUTO * 0.265</field>
+        <field name="register_id" ref="contrib_register_company"/>
+        <field name="appears_on_payslip" eval="False"/>
+    </record>
+
+    <record id="hr_rule_provision_vacaciones" model="hr.salary.rule">
+        <field name="name">Provisión de Vacaciones</field>
+        <field name="sequence" eval="220"/>
+        <field name="code">VACACIONES</field>
+        <field name="category_id" ref="PROVISION"/>
+        <field name="condition_select">none</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">result = categories.BRUTO * 0.0433</field>
+        <field name="appears_on_payslip" eval="False"/>
+    </record>
+
+    <record id="hr_rule_provision_aguinaldo" model="hr.salary.rule">
+        <field name="name">Provisión de Aguinaldo</field>
+        <field name="sequence" eval="230"/>
+        <field name="code">AGUINALDO</field>
+        <field name="category_id" ref="PROVISION"/>
+        <field name="condition_select">none</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">result = categories.BRUTO * 0.0833</field>
+        <field name="appears_on_payslip" eval="False"/>
     </record>
 
 </odoo>
