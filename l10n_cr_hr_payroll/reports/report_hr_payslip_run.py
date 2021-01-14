@@ -28,14 +28,18 @@ class ReportXslxPayrollRun(ReportXlsx):
 
         fila = 1
         for i, payslip in enumerate(payslip_run.slip_ids):
+            # Bank account type
             sheet.write(i+fila, 0, 'Cuenta de Ahorro')
-            bank_account_number = ''
+            # Bank account number
             if payslip.employee_id.bank_account_id and payslip.employee_id.bank_account_id.acc_number:
-                bank_account_number = payslip.employee_id.bank_account_id
-            sheet.write(i+fila, 1, bank_account_number)
+                sheet.write(i+fila, 1, payslip.employee_id.bank_account_id.acc_number)
+            # Net Salary
             monto = payslip.line_ids.filtered(lambda l: l.code == 'NETO')[0].total
             sheet.write(i+fila, 2, monto)
+            # Employee name
             sheet.write(i+fila, 3, payslip.employee_id.name)
-            sheet.write(i+fila, 4, payslip.employee_id.work_email or '')
+            # Work email
+            if payslip.employee_id.work_email:
+                sheet.write(i+fila, 4, payslip.employee_id.work_email)
 
 ReportXslxPayrollRun('report.l10n_cr_hr_payroll.payslip_run.xlsx', 'hr.payslip.run')
