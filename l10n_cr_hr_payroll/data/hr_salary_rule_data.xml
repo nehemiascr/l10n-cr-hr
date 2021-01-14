@@ -11,7 +11,8 @@
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
 # result = contract.wage
-result = contract.wage * worked_days.WORK100.number_of_days / 21
+salario_hora = contract.wage / 30 / 8
+result = worked_days.WORK100.number_of_hours * salario_hora
 </field>
     </record>
 
@@ -70,16 +71,33 @@ tramos = [ {'tasa':25, 'base':4337000},
            {'tasa':15, 'base':1236000},
            {'tasa':10, 'base':842000}  ]
 
-salario = categories.BRUTO
+salario_contrato = contract.wage
+excedente = categories.INGRESO
+
 impuesto = 0.0
-
+salario = salario_contrato
 for tramo in tramos:
-    if salario > tramo['base']:
-        monto = salario - tramo['base']
-        impuesto += monto * tramo['tasa'] / 100
-        salario -= monto
+  if salario > tramo['base']:
+    monto = salario - tramo['base']
+    impuesto += monto * tramo['tasa'] / 100
+    salario -= monto
+impuesto_contrato = impuesto
 
-result = - (impuesto)
+impuesto = 0.0
+salario = salario_contrato + excedente
+for tramo in tramos:
+  if salario > tramo['base']:
+    monto = salario - tramo['base']
+    impuesto += monto * tramo['tasa'] / 100
+    salario -= monto
+impuesto_bruto = impuesto
+
+estimado_renta = impuesto_contrato / 2
+diff = impuesto_bruto - impuesto_contrato
+
+impuesto_estimado = estimado_renta + diff
+
+result = - (impuesto_estimado)
         </field>
     </record>
 
