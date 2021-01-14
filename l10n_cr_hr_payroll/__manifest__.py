@@ -10,7 +10,7 @@
     'application': False,
     'sumary': 'Costa Rica Payroll Rules',
     'depends': [
-        'hr_payroll',
+        'hr_payroll', 'report_xlsx',
     ],
     'data': [
         'data/hr_contribution_register_data.xml',
@@ -21,5 +21,7 @@
         'views/hr_payslip_line_views.xml',
         'views/hr_payslip_run_views.xml',
         'views/hr_payslip_views.xml',
+
+        'reports/report_hr_payslip_run.xml',
     ],
 }
