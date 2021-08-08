@@ -10,7 +10,7 @@
     'application': False,
     'sumary': 'Costa Rica Payroll Rules',
     'depends': [
-        'hr_payroll',
+        'hr_payroll', 'to_hr_salary_rule_datetime_libs',
     ],
     'data': [
         'data/hr_contribution_register_data.xml',
