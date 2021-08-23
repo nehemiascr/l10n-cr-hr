@@ -2,7 +2,7 @@
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl.html).
 {
     'name': 'Costa Rica Payroll',
-    'version': '12.0.1.0.1',
+    'version': '11.0.0.1',
     'category': 'Human Resources',
     'author': 'Odoo CR Team, Odoo Community Association (OCA)',
     'license': 'AGPL-3',
