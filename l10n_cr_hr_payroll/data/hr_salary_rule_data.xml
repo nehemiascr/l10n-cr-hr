@@ -11,8 +11,8 @@
         <field name="amount_select">code</field>
         <field name="amount_python_compute">
 # result = contract.wage
-salario_hora = contract.wage / 30 / 8
-result = worked_days.WORK100.number_of_hours * salario_hora
+salario_hora = (contract.wage or 0) / 30 / 8
+result = (worked_days.WORK100.number_of_hours if worked_days.WORK100 else 0) * salario_hora
         </field>
     </record>
 
